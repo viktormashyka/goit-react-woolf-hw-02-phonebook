@@ -1,7 +1,9 @@
-import { Section } from 'components/Section/Section';
-import css from './Phonebook.module.css';
 import React, { Component } from 'react';
-import { nanoid } from 'nanoid';
+
+import css from './Phonebook.module.css';
+import ContactForm from 'components/ContactForm/ContactForm';
+import { Filter } from 'components/Filter/Filter';
+import { ContactList } from 'components/ContactList/ContactList';
 
 class Phonebook extends Component {
   state = {
@@ -12,8 +14,6 @@ class Phonebook extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
-    name: '',
-    number: '',
   };
 
   handleChange = evt => {
@@ -21,25 +21,7 @@ class Phonebook extends Component {
     this.setState({ [name]: value });
   };
 
-  handleSubmit = evt => {
-    evt.preventDefault();
-    const { name, number } = this.state;
-
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-
-    this.setState({ ...this.state.contacts.push(newContact) });
-    this.reset();
-  };
-
-  reset = () => {
-    this.setState({ name: '', number: '' });
-  };
-
-  filteredContacts = () => {
+  filterContacts = () => {
     return this.state.contacts.filter(contact =>
       contact.name
         .toLocaleLowerCase()
@@ -47,65 +29,25 @@ class Phonebook extends Component {
     );
   };
 
+  handleDelete = id => {
+    const newList = this.state.contacts.filter(item => item.id !== id);
+    this.setState({ contacts: newList });
+  };
+
   render() {
-    const { name, number, filter } = this.state;
+    const { filter, contacts } = this.state;
+    const filteredContacts = this.filterContacts();
     return (
       <div className={css.container}>
-        <Section title="Phonebook">
-          <form action="" className={css.form} onSubmit={this.handleSubmit}>
-            <label>
-              Name
-              <input
-                className="input"
-                type="text"
-                placeholder="Enter name"
-                name="name"
-                pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-                title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-                required
-                value={name}
-                onChange={this.handleChange}
-              />
-            </label>
-            <label>
-              Number
-              <input
-                className="input"
-                type="tel"
-                placeholder="Enter phone number"
-                name="number"
-                pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-                title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-                required
-                value={number}
-                onChange={this.handleChange}
-              />
-            </label>
-            <button type="submit">Add contact</button>
-          </form>
-        </Section>
-        <Section title="Contacts">
-          <label>
-            Find contact by name
-            <input
-              className="input"
-              type="text"
-              placeholder="Enter name"
-              name="filter"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              value={filter}
-              onChange={this.handleChange}
-            />
-          </label>
-          <ul className="list">
-            {this.filteredContacts() &&
-              this.filteredContacts().map(contact => (
-                <li className="item" key={contact.id}>
-                  {contact.name}: {contact.number}
-                </li>
-              ))}
-          </ul>
-        </Section>
+        <h1 className={css.title}>Phonebook</h1>
+        <ContactForm contacts={contacts} />
+
+        <h2 className={css.subtitle}>Contacts</h2>
+        <Filter filter={filter} onChange={this.handleChange} />
+        <ContactList
+          filteredContacts={filteredContacts}
+          handleDelete={this.handleDelete}
+        />
       </div>
     );
   }
