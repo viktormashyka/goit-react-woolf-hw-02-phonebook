@@ -8,4 +8,5 @@
 .input {
   font-size: 14px;
   padding: 5px 10px;
+  min-width: 250px;
 }
