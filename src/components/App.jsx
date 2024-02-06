@@ -29,8 +29,9 @@ class App extends Component {
   };
 
   handleDelete = id => {
-    const newList = this.state.contacts.filter(item => item.id !== id);
-    this.setState({ contacts: newList });
+    this.setState(prev => ({
+      contacts: prev.contacts.filter(item => item.id !== id),
+    }));
   };
 
   onAddContact = newContact => {
